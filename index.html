@@ -1,8 +1,244 @@
 <html>
   <head>
     <title>Converse</title>
+    <style>
+      .option {
+        width: 90%;
+        margin: 10px;
+        padding: 30px;
+        border: solid 1px blue;
+      }
+
+      .option:hover {
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    <p>hello world</p>
+    <textarea id="definition" style="width:100%;height:50vh;"></textarea>
+    <button id="definition-button" onclick="submitDefinition()" style="margin-top:10px;width:100%;height: 50px;">Submit</button>
+    <div id="chat-box"></div>
+
+    <script>
+      let definition;
+      let chat;
+      let stacks = [];
+      let lastChatEntry;
+
+      function submitDefinition() {
+        definition = document.getElementById('definition').value;
+        if (definition.length === 0) {
+          return;
+        }
+
+        document.getElementById('definition').remove();
+        document.getElementById('definition-button').remove();
+        chat = processDefinition(definition);
+
+        stacks[0] = lastChatEntry = chat[0];
+        lastChatEntry = chat[0];
+        processChatEntry(chat[0]);
+      }
+
+      function restart() {
+        chat = processDefinition(definition);
+        stacks[0] = lastChatEntry = chat[0];
+        lastChatEntry = chat[0];
+        processChatEntry(chat[0]);
+
+      }
+
+      function processAnswer(answerIndex, justReturnHTML) {
+        if (answerIndex != undefined) {
+          lastChatEntry.value = answerIndex;
+        }
+
+        if (lastChatEntry.O) {
+          const nextChatList = lastChatEntry.O[answerIndex];
+          if (nextChatList) {
+            const nextChatEntry = nextChatList[0];
+            stacks[nextChatEntry.level] = nextChatEntry;
+            lastChatEntry = nextChatEntry;
+            processChatEntry(nextChatEntry);
+          }
+          else {
+            if (lastChatEntry.parent) {
+              let nextChatEntry;
+              if (lastChatEntry.level === 0) {
+                for (const chatEntry of chat) {
+                  if (chatEntry.value === undefined) {
+                    nextChatEntry = chatEntry;
+                    return processChatEntry(chatEntry, justReturnHTML);
+                  }
+                }
+              }
+              else {
+                nextChatEntry = lastChatEntry.parent.O[lastChatEntry.parent.value][lastChatEntry.index + 1];
+              }
+
+              if (nextChatEntry) {
+                stacks[nextChatEntry.level] = nextChatEntry;
+                lastChatEntry = nextChatEntry;
+                processChatEntry(nextChatEntry);
+              }
+              else {
+                for (let i = stacks.length - 1; i >= 0; i--) {
+                  if (stacks[i]) {
+                    stacks[i] = undefined;
+                    break;
+                  }
+                }
+
+                for (let i = stacks.length - 1; i >= 0; i--) {
+                  if (!stacks[i]) {
+                    continue;
+                  }
+                  const entries = stacks[i].O[stacks[i].value];
+                  const unansweredEntry = entries.find(entry => entry.A.length > 0 && entry.value === undefined);
+                  if (unansweredEntry) {
+                    lastChatEntry = unansweredEntry;
+                    return processChatEntry(unansweredEntry, justReturnHTML);
+                  }
+                  else {
+                    stacks[i] = undefined;
+                  }
+                }
+
+                for (const chatEntry of chat) {
+                  if (chatEntry.value === undefined) {
+                    lastChatEntry = chatEntry;
+                    return processChatEntry(chatEntry, justReturnHTML);
+                  }
+                }
+              }
+            }
+            else {
+              alert('unhandled 1');
+            }
+          }
+        }
+        else {
+          alert('unhandleed 2');
+        }
+      }
+
+      function processChatEntry({E, Q, A, O, end}, justReturnHTML = false) {
+        let html = '';
+        if (E) {
+          html += '<p>' + E + '</p>';
+        }
+
+        if (Q) {
+          html += '<p>' + Q + '</p>';
+        }
+      
+        if (A && A.length > 0) {
+          A.map((eachA, index) => {
+            html += `<div class="option" onclick="processAnswer(${index})">${eachA}</div>`;
+          });
+        }
+        else if (!justReturnHTML && !end) {
+          html += processAnswer(undefined, true);
+        }
+
+        if (end) {
+          html += '<button onclick="restart()" style="margin-top:10px;width:100%;height: 50px;">Restart</button>'
+        }
+
+        if (justReturnHTML) {
+          return html;
+        }
+        else {
+          document.getElementById('chat-box').innerHTML = html;
+        }
+      }
+
+      function initEmptyChatEntry(level, parent, index) {
+        return { level, A:[], O: {}, parent, index }
+      }
+
+      function processDefinition(definition) {
+        let currentLine = '';
+        const chat = [];
+        const stacks = [];
+        let lastEntry
+
+        definition.split('\n').map(function (rawLine) {
+          const keyIndex = rawLine.indexOf(':');
+          if (keyIndex < 1) {
+            return;
+          }
+
+          const level = rawLine.substring(0, keyIndex - 1).length / 2;
+          const key = rawLine.substring(keyIndex - 1, keyIndex);
+          const text = rawLine.substring(keyIndex + 1);
+          let thisEntry;
+          if (!lastEntry) {
+            thisEntry = initEmptyChatEntry(level, chat, 0);
+            thisEntry[key] = text;
+            chat.push(thisEntry);
+            stacks[level] = thisEntry;
+          }
+          else if (lastEntry.level < level) {
+            // child
+            stacks[lastEntry.level] = lastEntry;
+            const lastQIndex = lastEntry.A.length - 1;
+            lastEntry.O[lastQIndex] = [];
+            thisEntry = initEmptyChatEntry(level, lastEntry, 0);
+            thisEntry[key] = text;
+            lastEntry.O[lastQIndex].push(thisEntry);
+          }
+          else if (lastEntry.level > level) {
+            for (let i = level + 1; i < stacks.length; i++) {
+              stacks[i] = undefined;
+            }
+            lastEntry = stacks[level];
+
+            if (key === 'A') {
+              thisEntry = lastEntry;
+              thisEntry.A.push(text);
+            }
+            else {
+              const parentEntry = stacks[level - 1];
+              if (parentEntry) {
+                thisEntry = initEmptyChatEntry(level, parentEntry, 0);
+                thisEntry[key] = text;
+                parentEntry.O[parentEntry.A.length - 1].push(thisEntry);
+              }
+              else {
+                thisEntry = initEmptyChatEntry(level, chat, 0);
+                thisEntry[key] = text;
+                chat.push(thisEntry);
+              }
+            }
+          }
+          else {
+            if (key === 'A') {
+              thisEntry = lastEntry;
+              thisEntry.A.push(text);
+            }
+            else {
+              const isIncompleteEntry = lastEntry.A.length === 0;
+              if (isIncompleteEntry) {
+                thisEntry = lastEntry;
+                thisEntry[key] = text;
+              }
+              else {
+                const parentEntry = stacks[level - 1];
+                const entryIndexInParent = parentEntry.A.length - 1;
+                thisEntry = initEmptyChatEntry(level, parentEntry, entryIndexInParent);
+                thisEntry[key] = text;
+                parentEntry.O[entryIndexInParent].push(thisEntry);
+              }
+            }
+            
+          }
+          lastEntry = thisEntry;
+        });
+        chat[chat.length - 1].end = true;
+
+        return chat;
+      }
+    </script>
   </body>
 </html>
