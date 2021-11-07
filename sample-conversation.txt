@@ -152,6 +152,10 @@ A:Go shopping
     A:Not really, my parents are quite strict when it comes to snacking
   A:Just mum
     E:I see
+    Q:Is it fun?
+    A:yes 
+    A:not realy
+    A:not at all
   A:Just dad
     E:I see
     Q:is it fun?
