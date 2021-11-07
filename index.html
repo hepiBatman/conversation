@@ -22,7 +22,7 @@
     <div id="chat-box">
       <p>
         This conversation is sourced from <b><a href="https://hepibatman.github.io/conversation/sample-conversation.txt">HERE</a></b>
-        <button id="definition-button-start" onclick="submitDefinition('./sample-conversation.txt')" 
+        <button id="definition-button-start" onclick="submitDefinition('https://hepibatman.github.io/conversation/sample-conversation.txt')" 
         style="margin-top:10px;margin-bottom:100px;height: 50px;width:100%;">Start</button>
       </p>
       
@@ -39,7 +39,7 @@
 
       function submitDefinition(url) {
         if (url) {
-          fetch('https://embed-view-bucket.s3.us-east-2.amazonaws.com/users/user1/bro.txt')
+          fetch(url)
           .then(response => response.text())
           .then(data => {
             definition = data;
@@ -257,10 +257,18 @@
               }
               else {
                 const parentEntry = stacks[level - 1];
-                const entryIndexInParent = parentEntry.A.length - 1;
-                thisEntry = initEmptyChatEntry(level, parentEntry, entryIndexInParent);
-                thisEntry[key] = text;
-                parentEntry.O[entryIndexInParent].push(thisEntry);
+                if (parentEntry) {
+                  const entryIndexInParent = parentEntry.A.length - 1;
+                  thisEntry = initEmptyChatEntry(level, parentEntry, entryIndexInParent);
+                  thisEntry[key] = text;
+                  parentEntry.O[entryIndexInParent].push(thisEntry);
+                }
+                else {
+                  thisEntry = initEmptyChatEntry(level, chat, 0);
+                  thisEntry[key] = text;
+                  chat.push(thisEntry);
+                  stacks[level] = thisEntry;
+                }
               }
             }
             
@@ -274,6 +282,7 @@
       
       let params = (new URL(document.location)).searchParams;
       if (params && params.get('source')) {
+        console.log(params.get('source'));
         submitDefinition(params.get('source'));
       }
     </script>
