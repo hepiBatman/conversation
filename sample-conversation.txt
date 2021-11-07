@@ -74,9 +74,16 @@ A:Stay home
         A:Yes
           Q:What game did you play?
           A:Minecraft
+            Q:what did you do 
+            A:build a house
+            A:chop some wood down
+            A:harvest
+            A:other
           A:Scratch
           A:Roblox
           A:song maker 
+          A:Pokémon 
+          A:pack man
         A:no       
         A:I took a 5-minute break then continue again, yipee ...
           E:Ehhh, that would not be great
@@ -176,14 +183,21 @@ A:Go play outside
     A:We cycled for an hour and return back home for meal
   A:At neighbour house, playing dolly
     E:Must be great having neighbour as friends
-E:Well nice conversing with you, let's do it some other time
+E:Well nice conversing with you, let's do it some other time toghether
 Q:Anything you want to ask me before we say good bye?
 A:Not really, this conversation tires me.
+A:extra questions
+  Q:what do a dog likes for Dinner
+  A:Dinnerbone 
+    Q:CORRECT
+    A:Next
+  A:bone
+A:What do you know anyway?
 A:What do you know anyway?
   E:Well not much, I can only answer what I am programmed to do.
   A:What are you programmed to do?
     E:Things like what we just conversed.
   A:Ah never mid. Sayonara, madam AI.
 A:Who made you?
-  E:My father made me, it was just couple of hours quick hacking job.
-E:Well, good day, human.
+  E:Sombody made me, it was just couple of hours quick doing job.
+E:Well, good day, person.
