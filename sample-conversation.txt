@@ -55,7 +55,7 @@ A:Stay home
             A:We were just lucky
           A:Yes, unfortunately
             E:Ah well, you just need to do it earlier next time then.
-    A:No
+    A:No 🌺 
       E:Well, lucky you.
       Q:You must have dried your school uniform before rain started?
       A:Well, not really.
@@ -64,7 +64,7 @@ A:Stay home
           E:That is fun
         A:I just re-wear my last week uniform tee hee hee ...😜
           E:Yuckie
-      A:Yes
+      A:Yes ⭐️ 
         E:Lucky you
     Q:So what did you do meantime?
     A:Play with my computer game
@@ -72,6 +72,12 @@ A:Stay home
       A:Just an hour
         Q:Did you take a break thereafter?
         A:Yes
+          Q:What game did you play?
+          A:Minecraft
+          A:Scratch
+          A:Roblox
+          A:song maker 
+        A:no       
         A:I took a 5-minute break then continue again, yipee ...
           E:Ehhh, that would not be great
           Q:would it?
