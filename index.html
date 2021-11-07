@@ -15,6 +15,7 @@
     </style>
   </head>
   <body>
+    <button id="definition-button-start" onclick="submitDefinition('./sample-conversation.txt')" style="margin-top:10px;margin-bottom:200px;width:100%;height: 50px;">Start</button>
     <textarea id="definition" style="width:100%;height:50vh;"></textarea>
     <button id="definition-button" onclick="submitDefinition()" style="margin-top:10px;width:100%;height: 50px;">Submit</button>
     <div id="chat-box"></div>
@@ -25,19 +26,38 @@
       let stacks = [];
       let lastChatEntry;
 
-      function submitDefinition() {
-        definition = document.getElementById('definition').value;
-        if (definition.length === 0) {
-          return;
+      function submitDefinition(url) {
+        if (url) {
+          fetch('https://hepibatman.github.io/conversation/sample-conversation.txt')
+          .then(response => response.text())
+          .then(data => {
+            definition = data;
+
+            document.getElementById('definition').remove();
+            document.getElementById('definition-button').remove();
+            document.getElementById('definition-button-start').remove();
+            chat = processDefinition(definition);
+
+            stacks[0] = lastChatEntry = chat[0];
+            lastChatEntry = chat[0];
+            processChatEntry(chat[0]);
+          });
         }
+        else {
+          definition = document.getElementById('definition').value;
+          if (definition.length === 0) {
+            return;
+          }
 
-        document.getElementById('definition').remove();
-        document.getElementById('definition-button').remove();
-        chat = processDefinition(definition);
+          document.getElementById('definition').remove();
+          document.getElementById('definition-button').remove();
+          document.getElementById('definition-button-start').remove();
+          chat = processDefinition(definition);
 
-        stacks[0] = lastChatEntry = chat[0];
-        lastChatEntry = chat[0];
-        processChatEntry(chat[0]);
+          stacks[0] = lastChatEntry = chat[0];
+          lastChatEntry = chat[0];
+          processChatEntry(chat[0]);
+        }
       }
 
       function restart() {
