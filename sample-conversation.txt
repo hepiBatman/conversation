@@ -154,6 +154,10 @@ A:Go shopping
     E:I see
   A:Just dad
     E:I see
+    Q:is it fun?
+    A:yes
+    A:not really
+    A:not at all
 A:Go play outside
   Q:What did you play?
   A:Anything you can play in the garden, like bicycling
